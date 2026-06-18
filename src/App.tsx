@@ -1,13 +1,11 @@
-import "./App.css";
-import { Button } from "@/components/ui/button";
+import { Navigate } from "react-router-dom";
 
-function App() {
-  return (
-    <div>
-      <h1>Hello cek</h1>
-      <Button>hai</Button>
-    </div>
-  );
+export default function App() {
+  const username = localStorage.getItem("username");
+
+  if (username) {
+    return <Navigate to="/dashboard" />;
+  }
+
+  return <Navigate to="/login" />;
 }
-
-export default App;
