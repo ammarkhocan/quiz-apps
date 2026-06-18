@@ -7,12 +7,12 @@ import { shuffleArray } from "@/utils/shuffle";
 import type { QuizQuestion, Answer } from "@/types/quiz";
 
 import { QuestionCard } from "@/components/quiz/question-card";
+import { Progress } from "@/components/ui/progress";
 
 export function Quiz() {
   const navigate = useNavigate();
 
   const [questions, setQuestions] = useState<QuizQuestion[]>([]);
-
   const [currentQuestion, setCurrentQuestion] = useState(0);
 
   const [answers, setAnswers] = useState<Answer[]>([]);
@@ -36,6 +36,9 @@ export function Quiz() {
   }, []);
 
   const question = questions[currentQuestion];
+
+  const progress =
+    questions.length > 0 ? ((currentQuestion + 1) / questions.length) * 100 : 0;
 
   const shuffledAnswers = useMemo(() => {
     if (!question) return [];
@@ -73,14 +76,30 @@ export function Quiz() {
   };
 
   if (loading) {
-    return <div>Loading...</div>;
+    return <div className="container mx-auto py-10">Loading...</div>;
+  }
+
+  if (!question) {
+    return (
+      <div className="container mx-auto py-10">Tidak ada soal tersedia</div>
+    );
   }
 
   return (
     <div className="container mx-auto max-w-3xl py-10">
-      <h1 className="mb-6 text-xl font-bold">
-        Soal {currentQuestion + 1} dari {questions.length}
-      </h1>
+      <div className="mb-6 space-y-2">
+        <div className="flex items-center justify-between">
+          <h1 className="text-xl font-bold">
+            Soal {currentQuestion + 1} dari {questions.length}
+          </h1>
+
+          <span className="text-sm text-muted-foreground">
+            {Math.round(progress)}%
+          </span>
+        </div>
+
+        <Progress value={progress} />
+      </div>
 
       <QuestionCard
         question={question.question}
