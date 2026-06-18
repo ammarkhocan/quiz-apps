@@ -9,6 +9,9 @@ import type { QuizQuestion, Answer } from "@/types/quiz";
 import { QuestionCard } from "@/components/quiz/question-card";
 import { Progress } from "@/components/ui/progress";
 
+import { useTimer } from "@/hooks/useTimer";
+import { QuizTimer } from "@/components/quiz/quiz-timer";
+
 export function Quiz() {
   const navigate = useNavigate();
 
@@ -18,6 +21,19 @@ export function Quiz() {
   const [answers, setAnswers] = useState<Answer[]>([]);
 
   const [loading, setLoading] = useState(true);
+
+  const submitQuiz = (finalAnswers: Answer[]) => {
+    localStorage.setItem("quiz_result", JSON.stringify(finalAnswers));
+
+    navigate("/result");
+  };
+
+  const { timeLeft } = useTimer({
+    initialTime: 600, // 10 menit
+    onTimeUp: () => {
+      submitQuiz(answers);
+    },
+  });
 
   useEffect(() => {
     async function fetchQuestions() {
@@ -66,9 +82,7 @@ export function Quiz() {
     const isLastQuestion = currentQuestion === questions.length - 1;
 
     if (isLastQuestion) {
-      localStorage.setItem("quiz_result", JSON.stringify(updatedAnswers));
-
-      navigate("/result");
+      submitQuiz(updatedAnswers);
       return;
     }
 
@@ -87,6 +101,12 @@ export function Quiz() {
 
   return (
     <div className="container mx-auto max-w-3xl py-10">
+      {/* Timer */}
+      <div className="mb-6 flex justify-end">
+        <QuizTimer timeLeft={timeLeft} />
+      </div>
+
+      {/* Progress */}
       <div className="mb-6 space-y-2">
         <div className="flex items-center justify-between">
           <h1 className="text-xl font-bold">
